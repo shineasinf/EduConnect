@@ -1,122 +1,414 @@
+// educonnect_mockup.dart
+// Simplified version — removed Reconciliation menu
+// Flutter SDK >=2.12 (null safety)
+
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(EduConnectMockApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
+class EduConnectMockApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'EduConnect Mockup',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'Poppins',
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MainScaffold(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class MainScaffold extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MainScaffoldState createState() => _MainScaffoldState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MainScaffoldState extends State<MainScaffold> {
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
+  final _pages = [
+    DashboardPage(),
+    PaymentsPage(),
+    MessagesPage(),
+    ProfilePage(),
+  ];
+
+  final _titles = [
+    'Dashboard',
+    'Payments',
+    'Messages',
+    'Profile',
+  ];
+
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('EduConnect — ${_titles[_selectedIndex]}'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(Icons.notifications_none),
+            onPressed: () {},
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      drawer: AppDrawer(),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: Colors.blue[800],
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.payment),
+            label: 'Payments',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message),
+            label: 'Messages',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+      floatingActionButton: _selectedIndex == 1
+          ? FloatingActionButton.extended(
+              onPressed: () {},
+              label: Text('New Payment'),
+              icon: Icon(Icons.add),
+            )
+          : null,
+    );
+  }
+}
+
+class AppDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SafeArea(
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue[700]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.school, color: Colors.blue[700], size: 36),
+                  ),
+                  SizedBox(height: 12),
+                  Text('SMP Harapan Bangsa',
+                      style: TextStyle(color: Colors.white, fontSize: 18)),
+                  SizedBox(height: 4),
+                  Text('Admin • admin@school.id',
+                      style: TextStyle(color: Colors.white70, fontSize: 12)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.info),
+              title: Text('School Info'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.account_balance_wallet),
+              title: Text('Bank & Payment Setup'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.insert_chart),
+              title: Text('Reports'),
+              onTap: () {},
+            ),
+            Spacer(),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () {},
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+// ---------- Pages ----------
+class DashboardPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSummaryCards(),
+          SizedBox(height: 16),
+          _buildRecentPaymentsCard(),
+          SizedBox(height: 16),
+          _buildMessagesCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCards() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(child: _SummaryCard(title: 'Total Collected', amount: 'IDR 120.450.000')),
+        SizedBox(width: 12),
+        Expanded(child: _SummaryCard(title: 'Pending', amount: 'IDR 12.500.000')),
+        SizedBox(width: 12),
+        Expanded(child: _SummaryCard(title: 'Students', amount: '560')),
+      ],
+    );
+  }
+
+  Widget _buildRecentPaymentsCard() {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Recent Payments', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: 4,
+              separatorBuilder: (_, __) => Divider(),
+              itemBuilder: (context, i) {
+                return ListTile(
+                  leading: CircleAvatar(child: Text('S${i + 1}')),
+                  title: Text('SPP Month ${i + 1}'),
+                  subtitle: Text('Parent: Budi — IDR 350.000'),
+                  trailing: Icon(Icons.check_circle, color: Colors.green),
+                );
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessagesCard() {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Recent Messages', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                TextButton(onPressed: () {}, child: Text('See all'))
+              ],
+            ),
+            ListTile(
+              leading: Icon(Icons.announcement),
+              title: Text('Field Trip Reminder'),
+              subtitle: Text('Tomorrow: Bring permission slip'),
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('New Parent Message'),
+              subtitle: Text('Question about payments'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  final String title;
+  final String amount;
+  const _SummaryCard({required this.title, required this.amount});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: TextStyle(color: Colors.grey[700])),
+            SizedBox(height: 8),
+            Text(amount, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PaymentsPage extends StatelessWidget {
+  final List<Map<String, String>> samplePayments = List.generate(6, (i) => {
+        'title': 'SPP Bulan ${i + 1}',
+        'amount': 'IDR ${300000 + i * 25000}',
+        'status': i % 3 == 0 ? 'paid' : (i % 3 == 1 ? 'pending' : 'overdue')
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: EdgeInsets.all(12),
+      itemCount: samplePayments.length,
+      itemBuilder: (context, i) {
+        final p = samplePayments[i];
+        return Card(
+          child: ListTile(
+            leading: Icon(Icons.receipt_long),
+            title: Text(p['title']!),
+            subtitle: Text(p['amount']! + ' • Status: ${p['status']}'),
+            trailing: _statusIcon(p['status']!),
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (_) => PaymentDetailSheet(payment: p),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _statusIcon(String status) {
+    if (status == 'paid') return Icon(Icons.check_circle, color: Colors.green);
+    if (status == 'pending') return Icon(Icons.hourglass_empty, color: Colors.orange);
+    return Icon(Icons.error, color: Colors.red);
+  }
+}
+
+class PaymentDetailSheet extends StatelessWidget {
+  final Map<String, String> payment;
+  const PaymentDetailSheet({required this.payment});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(payment['title']!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 8),
+          Text('Amount: ${payment['amount']}'),
+          SizedBox(height: 8),
+          Text('Status: ${payment['status']}'),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              ElevatedButton.icon(onPressed: () {}, icon: Icon(Icons.qr_code), label: Text('Pay via QR')),
+              SizedBox(width: 12),
+              OutlinedButton(onPressed: () {}, child: Text('Mark as Paid')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MessagesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(12),
+          child: TextField(
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.search),
+              hintText: 'Search messages or parents...',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.separated(
+            padding: EdgeInsets.all(12),
+            itemCount: 8,
+            separatorBuilder: (_, __) => Divider(),
+            itemBuilder: (context, i) {
+              return ListTile(
+                leading: CircleAvatar(child: Text('P${i + 1}')),
+                title: Text('Parent ${i + 1}'),
+                subtitle: Text('Message preview — please confirm payment'),
+                trailing: Text('2m'),
+                onTap: () {},
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
+              SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Admin — SMP Harapan Bangsa', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 4),
+                  Text('admin@school.id'),
+                ],
+              )
+            ],
+          ),
+          SizedBox(height: 16),
+          ListTile(leading: Icon(Icons.settings), title: Text('App Settings')),
+          ListTile(leading: Icon(Icons.receipt), title: Text('Payment Settings')),
+          ListTile(leading: Icon(Icons.account_tree), title: Text('Manage Classes & Students')),
+        ],
+      ),
     );
   }
 }
